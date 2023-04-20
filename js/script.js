@@ -35,9 +35,16 @@ function convertMeters() {
 }
 
 function isNumber(e){
-    e = e || window.event;
-    var charCode = e.which ? e.which : e.keyCode;
-    return /\d/.test(String.fromCharCode(charCode));
+    let val = e.currentTarget.value;
+    if(isNaN(val)){
+        val = val.replace(/[^-0-9\.]/g,'');
+        if(val.split('.').length>2) 
+             val =val.replace(/\.+$/,"");
+    }
+    e.currentTarget.value = val;
 }
+
+const input = document.querySelector("input");
+input.addEventListener("input", isNumber);
 
 setScale(0);
