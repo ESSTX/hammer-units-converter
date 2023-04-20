@@ -44,7 +44,23 @@ function isNumber(e){
     e.currentTarget.value = val;
 }
 
-const input = document.querySelector("input");
+const input = document.querySelector("input[name=units-input]");
 input.addEventListener("input", isNumber);
+const input2 = document.querySelector("input[name=meters-input]");
+input2.addEventListener("input", isNumber);
+
+function copyToClipboard(id, text) {
+  const element = document.createElement("textarea");
+  element.value = text;
+  document.body.appendChild(element);
+  element.select();
+  document.execCommand("copy");
+  document.body.removeChild(element);
+  
+  $(id).addClass("btn-new-success");
+  setTimeout(function() {
+      $(id).removeClass("btn-new-success");
+  }, 1000);
+}
 
 setScale(0);
