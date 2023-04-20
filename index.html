@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Hammer Units Converter</title>
+    <style>
+      /* Set the background color to a Half-Life 2 gray */
+      body {
+        background-color: #1F1F1F;
+        font-family: Arial, sans-serif;
+        color: #FFFFFF;
+        margin: 0;
+        padding: 0;
+      }
+
+      /* Add a red accent color for the headings */
+      h1, h2, p {
+        color: #CB3333;
+        margin: 0;
+        padding: 10px 0;
+      }
+
+      /* Style the container for the converter */
+      #converter {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #2B2B2B;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.5);
+
+        /* Add the following styles to center the div */
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+
+      /* Style the input labels and fields */
+      label {
+        display: block;
+        margin-bottom: 10px;
+        font-size: 18px;
+        font-weight: bold;
+      }
+
+      input, button {
+        font-size: 18px;
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        margin-bottom: 10px;
+        width: 100%;
+        box-sizing: border-box;
+        background-color: #3B3B3B;
+        color: #FFFFFF;
+      }
+
+      /* Style the buttons */
+      button {
+        background-color: #CB3333;
+        color: #FFFFFF;
+        cursor: pointer;
+        transition: all 0.2s ease-in-out;
+      }
+
+      button:hover {
+        background-color: #E65252;
+      }
+
+      /* Style the result text elements */
+      span {
+        font-weight: bold;
+        font-size: 24px;
+        color: #CB3333;
+      }
+
+      /* Style the unit conversion sections */
+      .unit-conversion {
+        margin-bottom: 20px;
+      }
+
+      .unit-conversion h2 {
+        font-size: 24px;
+        font-weight: bold;
+        text-align: center;
+        margin-bottom: 10px;
+      }
+    </style>
+    <script>
+      function convertUnits() {
+        // Get the input value
+        var units = parseFloat(document.getElementById("units-input").value);
+
+        // Convert units to meters
+        var meters = units * 0.0254;
+
+        // Display the output
+        document.getElementById("meters-output").textContent = meters.toFixed(2) + " meters";
+      }
+
+      function convertMeters() {
+        // Get the input value
+        var meters = parseFloat(document.getElementById("meters-input").value);
+
+        // Convert meters to units
+        var units = meters / 0.0254;
+
+        // Display the output
+        document.getElementById("units-output").textContent = units.toFixed(2) + " Hammer units";
+      }
+    </script>
+  </head>
+  <body>
+    <div id="converter">
+      <h1>Hammer Units Converter</h1>
+
+      <div class="unit-conversion">
+        <h2>Hammer Units to Meters</h2>
+
+        <label for="units-input">Enter Hammer Units:</label>
+        <input type="text" id="units-input" name="units-input">
+
+        <button onclick="convertUnits()">Convert</button>
+
+        <p>Result: <span id="meters-output"></span></p>
+      </div>
+
+      <div class="unit-conversion">
+        <h2>Meters to Hammer Units</h2>
+
+        <label for="meters-input">Enter Meters:</label>
+        <input type="text" id="meters-input" name="meters-input">
+
+        <button onclick="convertMeters()">Convert</button>
+
+        <p>Result: <span id="units-output"></span></p>
+      </div>
+    </div>
+  </body>
+</html>
