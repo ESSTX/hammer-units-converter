@@ -1,61 +1,87 @@
-let scale = 0;
-const SCALES = [0.01905, 0.254, 0.35];
-const INFO = [
-	"Architectural Scale (maps, architecture, certain models)",
-	"Entity Scale (most characters, certain models, in-game)",
-	"Only Skybox Scale"
-]
-let Elements = ["#a1", "#a2", "#a3"];
+const inputSelectors = {
+  UNITS: "#units-input",
+  METERS: "#meters-input",
+};
 
-function removeClasses(){
-	let i = 0;
-	while (let = i < Elements.length) {
-		$(Elements[i]).removeClass("btn-outline-light");
-		i++;
-	}
+const outputSelectors = {
+  UNITS: "#units-output",
+  METERS: "#meters-output",
+};
+
+const buttonSelectors = {
+  SCALE: ["#a1", "#a2", "#a3"],
+};
+
+const conversionScales = [0.01905, 0.254, 0.35];
+const conversionInfo = [
+  "Architectural Scale (for maps, architecture, and some models)",
+  "Entity Scale (for most characters, some models, and in-game objects)",
+  "Skybox Scale (for the size of the skybox)"
+];
+
+let currentScale = conversionScales[0];
+
+function removeClasses() {
+  buttonSelectors.SCALE.forEach(button => {
+    $(button).removeClass("btn-outline-light");
+  });
 }
 
-function setScale(number) {
-	if(typeof number != "number") {return} 
-	scale = SCALES[number];
-	removeClasses();
-	$(Elements[number]).addClass("btn-outline-light");
-	$("#info").text(INFO[number]);
+function setConversionScale(index) {
+  if (!_.isNumber(index) || !_.isFinite(conversionScales[index])) {
+    console.error('Invalid scale index:', index);
+    return;
+  }
+  
+  currentScale = conversionScales[index];
+  removeClasses();
+  $(buttonSelectors.SCALE[index]).addClass("btn-outline-light");
+  $("#info").text(conversionInfo[index]);
+
+  $("#units-input").trigger( "input" );
+  $("#meters-input").trigger( "input" );
 }
 
-function convertUnits() {
-	var units = new Big(document.getElementById("units-input").value);
-	var meters = units.times(scale);
-	document.getElementById("meters-output").textContent = meters.toString().slice(0, 7) + " meters";
+function convertInput() {
+  const $input = $(this);
+  const isUnitsInput = $input.is(inputSelectors.UNITS);
+  const str = $input.val().trim();
+  
+  if (_.isEmpty(str)) {
+    $(outputSelectors.UNITS).text("");
+    $(outputSelectors.METERS).text("");
+    return;
+  }
+  
+  const isValid = /^-?\d+(?:\.\d+)?$/.test(str);
+  
+  if (!isValid) {
+    const $output = isUnitsInput ? $(outputSelectors.METERS) : $(outputSelectors.UNITS);
+    $output.text("Invalid input");
+    return;
+  }
+  
+  const units = new Big(str);
+  const convertedValue = isUnitsInput ? units.times(currentScale) : units.div(currentScale);
+  const $output = isUnitsInput ? $(outputSelectors.METERS) : $(outputSelectors.UNITS);
+  $output.text(`${convertedValue.toFixed(2)} ${isUnitsInput ? "meters" : "Hammer Units"}`);
 }
-function convertMeters() {
-	var meters = new Big(document.getElementById("meters-input").value);
-	var units = meters.div(scale);
-	document.getElementById("units-output").textContent = units.toString().slice(0, 7) + " Hammer Units";
-}
-
-function isNumber(e){
-    let val = e.currentTarget.value;
-    if(isNaN(val)){
-        val = val.replace(/[^-0-9\.]/g,'');
-        if(val.split('.').length>2) 
-             val =val.replace(/\.+$/,"");
-    }
-    e.currentTarget.value = val;
-}
-
-const input = document.querySelector("input[name=units-input]");
-input.addEventListener("input", isNumber);
-const input2 = document.querySelector("input[name=meters-input]");
-input2.addEventListener("input", isNumber);
 
 function copyToClipboard(id, text) {
-  const element = document.createElement("textarea");
-  element.value = text;
-  document.body.appendChild(element);
-  element.select();
-  document.execCommand("copy");
-  document.body.removeChild(element);
+  if (!text) {
+    return;
+  }
+  const tmpElem = document.createElement('div');
+  const clipboardText = document.createTextNode(text);
+  tmpElem.appendChild(clipboardText);
+  document.body.insertAdjacentElement('beforeend', tmpElem);
+  const range = document.createRange();
+  range.selectNode(tmpElem);
+  const selection = window.getSelection();
+  selection.removeAllRanges();
+  selection.addRange(range);
+  document.execCommand('copy');
+  document.body.removeChild(tmpElem);
   
   $(id).addClass("btn-new-success");
   setTimeout(function() {
@@ -63,4 +89,34 @@ function copyToClipboard(id, text) {
   }, 1000);
 }
 
-setScale(0);
+$("#copy-units-btn").on("click", function() {
+  const unitsOutput = $("#units-output").text();
+  if (_.isEmpty(unitsOutput)) {
+    return;
+  }
+  copyToClipboard("#copy-units-btn", unitsOutput);
+});
+
+$("#copy-meters-btn").on("click", function() {
+  const metersOutput = $("#meters-output").text();
+  if (_.isEmpty(metersOutput)) {
+    return;
+  }
+  copyToClipboard("#copy-meters-btn", metersOutput);
+});
+
+setConversionScale(0);
+
+buttonSelectors.SCALE.forEach((button, index) => {
+  $(button).on("click", () => {
+    setConversionScale(index);
+  });
+});
+
+$(inputSelectors.UNITS).on("input", convertInput);
+$(inputSelectors.METERS).on("input", convertInput);
+
+var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+  return new bootstrap.Tooltip(tooltipTriggerEl)
+})
